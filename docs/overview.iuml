@@ -1,6 +1,5 @@
 @startuml
 skinparam linetype straight
-skinparam backgroundColor transparent
 skinparam monochrome true
 
 title System Overview
