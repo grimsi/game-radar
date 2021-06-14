@@ -31,4 +31,4 @@ docker run -d --net=host --name game-radar grimsi/game-radar:latest
 
 ## System design
 
-![System Overview](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/grimsi/game-radar/master/docs/overview.iuml)
+![System Overview](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/grimsi/game-radar/main/docs/overview.iuml)
