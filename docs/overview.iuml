@@ -1,0 +1,27 @@
+@startuml
+skinparam linetype straight
+skinparam backgroundColor transparent
+skinparam monochrome true
+
+title System Overview
+
+actor "User" as user
+node "Game Radar" as game_radar {
+    node "Frontend" as frontend
+    node "Backend" as backend
+}
+cloud "Game Servers" as game_servers {
+    node "Minecraft" as minecraft
+    node "CS:GO" as csgo
+    node "Garry's Mod" as gmod
+    node "..." as misc_servers
+}
+
+user -> frontend
+frontend <-> backend
+backend --> gmod
+backend --> csgo
+backend --> minecraft
+backend -> misc_servers
+
+@enduml
