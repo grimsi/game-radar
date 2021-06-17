@@ -1,12 +1,36 @@
 package de.grimsi.gameradar.pluginapi;
 
-public record PluginMetaInfo(
-        String name,
-        Class<? extends GameRadarPlugin> type,
-        String version,
-        String author,
-        String description,
-        String supportedProviders,
-        String license,
-        String repositoryUrl
-) {}
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.ToString;
+
+import java.util.List;
+
+@Data
+@Builder
+@ToString
+public class PluginMetaInfo {
+
+    @NonNull
+    private String name;
+
+    @NonNull
+    private Class<? extends GameRadarPlugin> type;
+
+    @NonNull
+    private String version;
+
+    @NonNull
+    private String author;
+
+    @NonNull
+    private String description;
+
+    @NonNull
+    private List<String> supportedProviders;
+
+    private String license;
+
+    private String repositoryUrl;
+}

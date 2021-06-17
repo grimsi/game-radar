@@ -1,7 +1,7 @@
 #set($symbol_pound='#')
-#set($symbol_dollar='$')
-#set($symbol_escape='\' )
-package ${package};
+        #set($symbol_dollar='$')
+        #set($symbol_escape='\' )
+        package ${package};
 
 import de.grimsi.gameradar.pluginapi.PluginMetaInfo;
 import de.grimsi.gameradar.pluginapi.serverstatus.ServerState;

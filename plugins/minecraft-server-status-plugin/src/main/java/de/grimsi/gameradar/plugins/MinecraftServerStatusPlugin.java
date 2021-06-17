@@ -37,8 +37,8 @@ public class MinecraftServerStatusPlugin implements ServerStatusPlugin {
 
         return ServerStatus.builder()
                 .status(ServerState.RUNNING)
-                .currentPlayers(Integer.parseInt(ms.getCurrentPlayers()))
-                .maxPlayers(Integer.parseInt(ms.getMaximumPlayers()))
+                .currentPlayers(ms.getCurrentPlayers())
+                .maxPlayers(ms.getMaximumPlayers())
                 .build();
     }
 

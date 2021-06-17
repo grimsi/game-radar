@@ -4,21 +4,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.grimsi.gameradar</groupId>
+    <groupId>de.grimsi.gameradar.pluginapi</groupId>
     <artifactId>plugin-api</artifactId>
     <version>1.0.0</version>
 
     <properties>
         <java.version>16</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <record-builder.version>1.19</record-builder.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.soabase.record-builder</groupId>
-            <artifactId>record-builder-core</artifactId>
-            <version>${record-builder.version}</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.20</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -32,16 +31,6 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <annotationProcessorPaths>
-                        <annotationProcessorPath>
-                            <groupId>io.soabase.record-builder</groupId>
-                            <artifactId>record-builder-processor</artifactId>
-                            <version>${record-builder.version}</version>
-                        </annotationProcessorPath>
-                    </annotationProcessorPaths>
-                    <annotationProcessors>
-                        <annotationProcessor>io.soabase.recordbuilder.processor.RecordBuilderProcessor</annotationProcessor>
-                    </annotationProcessors>
                 </configuration>
             </plugin>
         </plugins>

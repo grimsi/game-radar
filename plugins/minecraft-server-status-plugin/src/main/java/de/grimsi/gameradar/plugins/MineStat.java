@@ -1,6 +1,6 @@
 /*
  * MineStat.java - A Minecraft server status checker
- * Copyright (C) 2014 Lloyd Dilley
+ * Copyright (C) 2014-2021 Lloyd Dilley
  * http://www.dilley.me/
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,17 +19,16 @@
  */
 
 /**
- * @authors Lloyd Dilley, grimsi
+ * @author Lloyd Dilley
  */
 
 package de.grimsi.gameradar.plugins;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import lombok.Data;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -37,9 +36,11 @@ import java.nio.charset.StandardCharsets;
 
 @Data
 public class MineStat {
-    private static final byte NUM_FIELDS = 6;      // number of values expected from server
-    private static final byte NUM_FIELDS_BETA = 3; // number of values expected from a 1.8b/1.3 server
-    private static final int DEFAULT_TIMEOUT = 5;  // default TCP timeout in seconds
+    public static final String VERSION = "2.0.0"; // MineStat version
+    public static final byte NUM_FIELDS = 6;      // number of values expected from server
+    public static final byte NUM_FIELDS_BETA = 3; // number of values expected from a 1.8b/1.3 server
+    public static final int DEFAULT_TIMEOUT = 5;  // default TCP timeout in seconds
+    public static final int DEFAULT_PORT = 25565; // default TCP port
 
     public enum Retval {
         SUCCESS(0), CONNFAIL(-1), TIMEOUT(-2), UNKNOWN(-3);
@@ -52,6 +53,20 @@ public class MineStat {
 
         public int getRetval() {
             return retval;
+        }
+    }
+
+    public enum Request {
+        NONE(-1), BETA(0), LEGACY(1), EXTENDED(2), JSON(3);
+
+        private final int request;
+
+        private Request(int request) {
+            this.request = request;
+        }
+
+        public int getRequest() {
+            return request;
         }
     }
 
@@ -88,57 +103,147 @@ public class MineStat {
     /**
      * Current number of players on the server
      */
-    private String currentPlayers;
+    private int currentPlayers;
 
     /**
      * Maximum player capacity of the server
      */
-    private String maximumPlayers;
+    private int maximumPlayers;
 
     /**
      * Ping time to server in milliseconds
      */
     private long latency;
 
-    MineStat(String address, int port) {
-        this(address, port, DEFAULT_TIMEOUT);
+    /**
+     * SLP protocol version
+     */
+    private String requestType;
+
+    public MineStat(String address) {
+        this(address, DEFAULT_PORT, DEFAULT_TIMEOUT, Request.NONE);
     }
 
-    MineStat(String address, int port, int timeout) {
+    public MineStat(String address, int port) {
+        this(address, port, DEFAULT_TIMEOUT, Request.NONE);
+    }
+
+    public MineStat(String address, int port, int timeout) {
+        this(address, port, timeout, Request.NONE);
+    }
+
+    public MineStat(String address, int port, int timeout, Request requestType) {
         setAddress(address);
         setPort(port);
         setTimeout(timeout);
-        /*
-         * Try the newest protocol first and work down. If the query succeeds or the
-         * connection fails, there is no reason to continue with subsequent queries.
-         * Attempts should continue in the event of a timeout however since it may
-         * be due to an issue during the handshake.
-         * Note: Newer server versions may still respond to older ping query types.
-         * For example, 1.13.2 responds to 1.4/1.5 queries, but not 1.6 queries.
-         */
-        // 1.7
-        Retval retval = jsonQuery(address, port, getTimeout());
-        // 1.6
-        if (retval != Retval.SUCCESS && retval != Retval.CONNFAIL) {
-            retval = newQuery(address, port, getTimeout());
-        }
-        // 1.4/1.5
-        if (retval != Retval.SUCCESS && retval != Retval.CONNFAIL) {
-            retval = legacyQuery(address, port, getTimeout());
-        }
-        // 1.8b/1.3
-        if (retval != Retval.SUCCESS && retval != Retval.CONNFAIL) {
-            retval = betaQuery(address, port, getTimeout());
+        switch (requestType) {
+            case BETA -> betaRequest(address, port, getTimeout());
+            case LEGACY -> legacyRequest(address, port, getTimeout());
+            case EXTENDED -> extendedLegacyRequest(address, port, getTimeout());
+            case JSON -> jsonRequest(address, port, getTimeout());
+            default -> {
+                /*
+                 * Attempt various SLP ping requests in a particular order. If the request
+                 * succeeds or the connection fails, there is no reason to continue with
+                 * subsequent requests. Attempts should continue in the event of a timeout
+                 * however since it may be due to an issue during the handshake.
+                 * Note: Newer server versions may still respond to older SLP requests.
+                 * For example, 1.13.2 responds to 1.4/1.5 queries, but not 1.6 queries.
+                 */
+                // SLP 1.4/1.5
+                Retval retval = legacyRequest(address, port, getTimeout());
+                // SLP 1.8b/1.3
+                if (retval != Retval.SUCCESS && retval != Retval.CONNFAIL)
+                    retval = betaRequest(address, port, getTimeout());
+                // SLP 1.6
+                if (retval != Retval.SUCCESS && retval != Retval.CONNFAIL)
+                    retval = extendedLegacyRequest(address, port, getTimeout());
+                // SLP 1.7
+                if (retval != Retval.SUCCESS && retval != Retval.CONNFAIL)
+                    retval = jsonRequest(address, port, getTimeout());
+            }
         }
     }
 
-    private int getTimeout() {
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public int getTimeout() {
         return timeout * 1000;
     } // convert to milliseconds
 
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+    public String getMotd() {
+        return motd;
+    }
+
+    public void setMotd(String motd) {
+        this.motd = motd;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public int getCurrentPlayers() {
+        return currentPlayers;
+    }
+
+    public void setCurrentPlayers(int currentPlayers) {
+        this.currentPlayers = currentPlayers;
+    }
+
+    public int getMaximumPlayers() {
+        return maximumPlayers;
+    }
+
+    public void setMaximumPlayers(int maximumPlayers) {
+        this.maximumPlayers = maximumPlayers;
+    }
+
+    public long getLatency() {
+        return latency;
+    }
+
+    public void setLatency(long latency) {
+        this.latency = latency;
+    }
+
+    public boolean isServerUp() {
+        return serverUp;
+    }
+
+    public String getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
+    }
+
     /*
      * 1.8b/1.3
-     * 1.8 beta through 1.3 servers communicate as follows for a ping query:
+     * 1.8 beta through 1.3 servers communicate as follows for a ping request:
      * 1. Client sends \xFE (server list ping)
      * 2. Server responds with:
      *   2a. \xFF (kick packet)
@@ -146,7 +251,7 @@ public class MineStat {
      *   2c. 3 fields delimited by \u00A7 (section symbol)
      * The 3 fields, in order, are: message of the day, current players, and max players
      */
-    private Retval betaQuery(String address, int port, int timeout) {
+    public Retval betaRequest(String address, int port, int timeout) {
         try {
             String[] serverData = null;
             byte[] rawServerData = null;
@@ -169,15 +274,16 @@ public class MineStat {
             }
 
             serverData = new String(rawServerData, StandardCharsets.UTF_16).split("\u00A7"); // section symbol
+
             if (serverData.length >= NUM_FIELDS_BETA) {
-                setVersion("1.8b/1.3"); // since server does not return version, set it
+                setVersion(">=1.8b/1.3"); // since server does not return version, set it
                 setMotd(serverData[0]);
-                setCurrentPlayers(serverData[1]);
-                setMaximumPlayers(serverData[2]);
+                setCurrentPlayers(Integer.parseInt(serverData[1]));
+                setMaximumPlayers(Integer.parseInt(serverData[2]));
                 serverUp = true;
-            } else {
+                setRequestType("SLP 1.8b/1.3 (beta)");
+            } else
                 return Retval.UNKNOWN;
-            }
         } catch (SocketTimeoutException ste) {
             return Retval.TIMEOUT;
         } catch (IOException ce) {
@@ -191,7 +297,7 @@ public class MineStat {
 
     /*
      * 1.4/1.5
-     * 1.4 and 1.5 servers communicate as follows for a ping query:
+     * 1.4 and 1.5 servers communicate as follows for a ping request:
      * 1. Client sends:
      *   1a. \xFE (server list ping)
      *   1b. \x01 (server list ping payload)
@@ -204,7 +310,7 @@ public class MineStat {
      * The protocol version corresponds with the server version and can be the
      * same for different server versions.
      */
-    private Retval legacyQuery(String address, int port, int timeout) {
+    public Retval legacyRequest(String address, int port, int timeout) {
         try {
             String[] serverData = null;
             byte[] rawServerData = null;
@@ -232,12 +338,12 @@ public class MineStat {
                 // serverData[1] contains the protocol version (51 for example)
                 setVersion(serverData[2]);
                 setMotd(serverData[3]);
-                setCurrentPlayers(serverData[4]);
-                setMaximumPlayers(serverData[5]);
+                setCurrentPlayers(Integer.parseInt(serverData[4]));
+                setMaximumPlayers(Integer.parseInt(serverData[5]));
                 serverUp = true;
-            } else {
+                setRequestType("SLP 1.4/1.5 (legacy)");
+            } else
                 return Retval.UNKNOWN;
-            }
         } catch (SocketTimeoutException ste) {
             return Retval.TIMEOUT;
         } catch (IOException ce) {
@@ -251,7 +357,7 @@ public class MineStat {
 
     /*
      * 1.6
-     * 1.6 servers communicate as follows for a ping query:
+     * 1.6 servers communicate as follows for a ping request:
      * 1. Client sends:
      *   1a. \xFE (server list ping)
      *   1b. \x01 (server list ping payload)
@@ -272,7 +378,7 @@ public class MineStat {
      * The protocol version corresponds with the server version and can be the
      * same for different server versions.
      */
-    private Retval newQuery(String address, int port, int timeout) {
+    public Retval extendedLegacyRequest(String address, int port, int timeout) {
         try {
             String[] serverData = null;
             byte[] rawServerData = null;
@@ -304,17 +410,18 @@ public class MineStat {
             }
 
             serverData = new String(rawServerData, StandardCharsets.UTF_16).split("\u0000"); // null
+
             if (serverData.length >= NUM_FIELDS) {
                 // serverData[0] contains the section symbol and 1
                 // serverData[1] contains the protocol version (always 127 for >=1.7.x)
                 setVersion(serverData[2]);
                 setMotd(serverData[3]);
-                setCurrentPlayers(serverData[4]);
-                setMaximumPlayers(serverData[5]);
+                setCurrentPlayers(Integer.parseInt(serverData[4]));
+                setMaximumPlayers(Integer.parseInt(serverData[5]));
                 serverUp = true;
-            } else {
+                setRequestType("SLP 1.6 (extended legacy)");
+            } else
                 return Retval.UNKNOWN;
-            }
         } catch (SocketTimeoutException ste) {
             return Retval.TIMEOUT;
         } catch (IOException ce) {
@@ -327,8 +434,53 @@ public class MineStat {
     }
 
     /*
+     * Unpack an int from a varint
+     */
+    public int recvVarInt(DataInputStream dis) {
+        try {
+            int intData = 0, width = 0;
+            while (true) {
+                int varInt = dis.readByte();
+                intData |= (varInt & 0x7F) << width++ * 7;
+                if (width > 5)
+                    return Retval.UNKNOWN.getRetval(); // overflow
+                if ((varInt & 0x80) != 128)           // Little Endian Base 128 (LEB128)
+                    break;
+            }
+            return intData;
+        } catch (IOException ioe) {
+            return Retval.UNKNOWN.getRetval();
+        }
+    }
+
+    /*
+     * Pack a varint from an int
+     */
+    public void sendVarInt(DataOutputStream dos, int intData) {
+        try {
+            while (true) {
+                if ((intData & 0xFFFFFF80) == 0) {
+                    dos.writeByte(intData);
+                    return;
+                }
+                dos.writeByte(intData & 0x7F | 0x80);
+                intData >>>= 7;
+            }
+        } catch (IOException ignored) {
+        }
+    }
+
+    /*
+     * Check if MineStat object data is present
+     */
+    public boolean isDataValid() {
+        // Do not check for empty motd in case server has none
+        return this.motd != null && this.version != null && !this.version.trim().isEmpty() && currentPlayers >= 0 && maximumPlayers >= 0;
+    }
+
+    /*
      * 1.7
-     * 1.7 to current servers communicate as follows for a ping query:
+     * 1.7 to current servers communicate as follows for a ping request:
      * 1. Client sends:
      *   1a. \x00 (handshake packet containing the fields specified below)
      *   1b. \x00 (request)
@@ -344,7 +496,51 @@ public class MineStat {
      *   'version': {'protocol': 404, 'name': '1.13.2'},
      *   'description': {'text': 'A Minecraft Server'}}
      */
-    private Retval jsonQuery(String address, int port, int timeout) {
-        return Retval.UNKNOWN; // ToDo: Implement me!
+    public Retval jsonRequest(String address, int port, int timeout) {
+        try {
+            String[] serverData = null;
+            byte[] rawServerData = null;
+            Socket clientSocket = new Socket();
+            long startTime = System.currentTimeMillis();
+            clientSocket.connect(new InetSocketAddress(getAddress(), getPort()), getTimeout());
+            setLatency(System.currentTimeMillis() - startTime);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream payload = new DataOutputStream(baos);
+            DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
+            DataInputStream dis = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
+            payload.writeByte(0x00);               // handshake packet
+            sendVarInt(payload, 0x00);             // protocol version
+            sendVarInt(payload, address.length()); // packed remote address length as varint
+            payload.writeBytes(address);           // remote address as string
+            payload.writeShort(port);              // remote port as short
+            sendVarInt(payload, 0x01);             // state packet
+            sendVarInt(dos, baos.size());          // payload size as varint
+            dos.write(baos.toByteArray());         // send payload
+            dos.writeByte(0x01);                   // size
+            dos.writeByte(0x00);                   // ping packet
+            int totalLength = recvVarInt(dis);     // total response size
+            int packetID = recvVarInt(dis);        // packet ID
+            int jsonLength = recvVarInt(dis);      // JSON response size
+            byte[] rawData = new byte[jsonLength]; // storage for JSON data
+            dis.read(rawData);                     // fill byte array with JSON data
+            // Populate object from JSON data
+            JsonObject jobj = new Gson().fromJson(new String(rawData), JsonObject.class);
+            setMotd(jobj.get("description").getAsJsonObject().get("text").getAsString());
+            setVersion(jobj.get("version").getAsJsonObject().get("name").getAsString());
+            setCurrentPlayers(jobj.get("players").getAsJsonObject().get("online").getAsInt());
+            setMaximumPlayers(jobj.get("players").getAsJsonObject().get("max").getAsInt());
+            serverUp = true;
+            setRequestType("SLP 1.7 (JSON)");
+            if (!isDataValid())
+                return Retval.UNKNOWN;
+        } catch (SocketTimeoutException ste) {
+            return Retval.TIMEOUT;
+        } catch (IOException ce) {
+            return Retval.CONNFAIL;
+        } catch (Exception e) {
+            serverUp = false;
+            return Retval.UNKNOWN;
+        }
+        return Retval.SUCCESS;
     }
 }
