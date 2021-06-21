@@ -42,13 +42,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.cors().and().csrf().disable();
+        // TODO: Try to enable CSRF
+        http.csrf().disable();
 
+        // Allow GET-Requests on *all* URLs (Frontend will handle 404 and permission)
+        // except paths under "/v1" (because that's where the backend is reachable
+        // but allow the login, setup and password reset endpoints
+        // Deny the other HTTP methods on all paths
         http.authorizeRequests()
-                .antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**", "/swagger-ui.html", "/webjars/**", "/swagger-ui/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/v1/login/**", "/v1/setup").permitAll()
                 .antMatchers(HttpMethod.GET, "/v1/login/requestPasswordReset/**", "/v1/login/resetPassword/**").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers("/v1/**").authenticated()
+                .antMatchers(HttpMethod.GET).permitAll()
+                .anyRequest().denyAll();
 
         http.addFilter(getJWTAuthenticationFilter(authenticationManager()))
                 .addFilter(new JWTAuthorizationFilter(authenticationManager(), configuration))
