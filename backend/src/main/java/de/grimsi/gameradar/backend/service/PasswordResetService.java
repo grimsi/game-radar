@@ -3,8 +3,8 @@ package de.grimsi.gameradar.backend.service;
 import de.grimsi.gameradar.backend.configuration.ApplicationProperties;
 import de.grimsi.gameradar.backend.dto.PasswordResetTokenDto;
 import de.grimsi.gameradar.backend.entity.PasswordResetToken;
-import de.grimsi.gameradar.backend.repository.PasswordResetTokenRepository;
 import de.grimsi.gameradar.backend.entity.User;
+import de.grimsi.gameradar.backend.repository.PasswordResetTokenRepository;
 import de.grimsi.gameradar.backend.repository.UserRepository;
 import org.apache.commons.text.StringSubstitutor;
 import org.modelmapper.ModelMapper;
@@ -17,7 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
@@ -116,7 +115,7 @@ public class PasswordResetService {
             }
         }
 
-        Instant validUntil = Instant.now().plus(Duration.parse(config.getPasswordResetTokenExpirationTime()));
+        Instant validUntil = Instant.now().plus(config.getPasswordResetTokenExpirationTime());
 
         PasswordResetToken token = new PasswordResetToken();
         token.setValidUntil(validUntil);

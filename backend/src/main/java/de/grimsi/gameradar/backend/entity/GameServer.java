@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.time.Duration;
 
 @Entity
 @Data
@@ -18,4 +19,5 @@ public class GameServer {
     private String host;
     private Integer port;
     private String game;
+    private Duration refreshDuration;
 }

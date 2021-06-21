@@ -18,7 +18,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -72,7 +71,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String[] authorityNamesArray = new String[authorityNames.size()];
         authorityNames.toArray(authorityNamesArray);
 
-        Date expirationDate = Date.from(Instant.now().plus(Duration.parse(config.getJwtExpirationTime())));
+        Date expirationDate = Date.from(Instant.now().plus(config.getJwtExpirationTime()));
 
         String token = JWT.create()
                 .withSubject(((User) auth.getPrincipal()).getId().toString())

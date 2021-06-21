@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +28,7 @@ public class GameServerController implements GameServerApi {
     }
 
     @Override
-    public ResponseEntity<GameServerDto> createGameServer(@Valid GameServerDto body) {
+    public ResponseEntity<GameServerDto> createGameServer(GameServerDto body) {
         return new ResponseEntity<>(gameServerService.create(body), HttpStatus.CREATED);
     }
 

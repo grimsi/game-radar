@@ -2,14 +2,15 @@ package de.grimsi.gameradar.backend.api;
 
 import de.grimsi.gameradar.backend.annotations.IsGameserverManager;
 import de.grimsi.gameradar.backend.dto.GameServerDto;
+import de.grimsi.gameradar.backend.validations.GameServerValidations;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.Authorization;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,12 +33,12 @@ public interface GameServerApi {
     @ApiOperation(value = "Create a new game server", authorizations = {@Authorization(value = "auth")})
     @IsGameserverManager
     @PostMapping(consumes = {"application/json"}, produces = {"application/json"})
-    ResponseEntity<GameServerDto> createGameServer(@Valid @RequestBody GameServerDto body);
+    ResponseEntity<GameServerDto> createGameServer(@Validated(GameServerValidations.Create.class) @RequestBody GameServerDto body);
 
     @ApiOperation(value = "Edit a game server", authorizations = {@Authorization(value = "auth")})
     @IsGameserverManager
     @PatchMapping(value = "/{gameServerId}", consumes = {"application/json"}, produces = {"application/json"})
-    ResponseEntity<GameServerDto> editGameServer(@Valid @RequestBody GameServerDto body, @PathVariable Long gameServerId);
+    ResponseEntity<GameServerDto> editGameServer(@Validated(GameServerValidations.Update.class) @RequestBody GameServerDto body, @PathVariable Long gameServerId);
 
     @ApiOperation(value = "Delete a game server", authorizations = {@Authorization(value = "auth")})
     @IsGameserverManager

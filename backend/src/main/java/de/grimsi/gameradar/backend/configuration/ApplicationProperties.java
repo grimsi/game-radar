@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import java.time.Duration;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -14,10 +15,10 @@ import java.util.UUID;
 @ConfigurationProperties(prefix = "game-radar")
 public class ApplicationProperties {
     private UUID secret;
-    private String jwtExpirationTime;
+    private Duration jwtExpirationTime;
     private String jwtRoleKey;
-    private String passwordResetTokenExpirationTime;
+    private Duration passwordResetTokenExpirationTime;
     private boolean allowAdminPasswordReset;
     private Locale defaultLocale;
-    private String serverStatusMinRefreshDuration;
+    private Duration serverStatusDefaultRefreshDuration;
 }

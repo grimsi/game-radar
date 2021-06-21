@@ -9,6 +9,11 @@
       "name": "build.version",
       "type": "java.lang.String",
       "description": "Version of the application."
+    },
+    {
+      "name": "game-radar.server-status-default-refresh-duration",
+      "type": "java.time.Duration",
+      "description": "The default time to wait between two server status refreshes (per server). Has to be in ISO-8601 format."
     }
   ]
 }

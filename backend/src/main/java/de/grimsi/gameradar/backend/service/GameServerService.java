@@ -5,23 +5,12 @@ import de.grimsi.gameradar.backend.dto.GameServerDto;
 import de.grimsi.gameradar.backend.dto.ServerStatusDto;
 import de.grimsi.gameradar.backend.entity.GameServer;
 import de.grimsi.gameradar.backend.repository.GameServerRepository;
-import de.grimsi.gameradar.pluginapi.PluginNotFoundException;
-import de.grimsi.gameradar.pluginapi.serverstatus.ServerStatus;
-import de.grimsi.gameradar.pluginapi.serverstatus.ServerStatusPlugin;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class GameServerService extends DatabaseService<GameServer, GameServerDto, GameServerRepository> {
@@ -33,15 +22,10 @@ public class GameServerService extends DatabaseService<GameServer, GameServerDto
     private GameServerRepository gameServerRepository;
 
     @Autowired
-    private ModelMapper mapper;
-
-    @Autowired
-    private PluginManager pluginManager;
+    private GameServerStatusService gameServerStatusService;
 
     @Autowired
     private ApplicationProperties config;
-
-    private final Map<Long, ServerStatusDto> serverStatusCache = new HashMap<>();
 
     public List<GameServerDto> getAll(Optional<String> host) {
         if (host.isPresent()) {
@@ -64,16 +48,24 @@ public class GameServerService extends DatabaseService<GameServer, GameServerDto
         GameServer gameServer = convertToEntity(gameServerDto);
 
         /* Check if a plugin is installed that can handle the specified game */
-        ServerStatusPlugin matchingPlugin = getMatchingPlugin(gameServer.getGame());
+        gameServerStatusService.checkForMatchingPlugin(gameServer.getGame());
 
         if (gameServer.getPort() == null) {
-            gameServer.setPort(matchingPlugin.getDefaultServerPort());
+            gameServer.setPort(gameServerStatusService.getDefaultServerPort(gameServer.getGame()));
+        }
+
+        if (gameServer.getRefreshDuration() == null) {
+            gameServer.setRefreshDuration(config.getServerStatusDefaultRefreshDuration());
         }
 
         log.debug("create gameserver: {}", gameServer);
         gameServer = gameServerRepository.save(gameServer);
 
-        return convertToDto(gameServer);
+        gameServerDto = convertToDto(gameServer);
+
+        gameServerStatusService.scheduleServerStatusRefresh(gameServerDto);
+
+        return gameServerDto;
     }
 
     @Override
@@ -93,74 +85,40 @@ public class GameServerService extends DatabaseService<GameServer, GameServerDto
         }
 
         if (gameServerDto.getGame() != null) {
-            getMatchingPlugin(gameServerDto.getGame());
+            gameServerStatusService.checkForMatchingPlugin(gameServerDto.getGame());
             existingGameServer.setGame(gameServerDto.getGame());
+        }
+
+        if (gameServerDto.getRefreshDuration() != null) {
+            existingGameServer.setRefreshDuration(gameServerDto.getRefreshDuration());
         }
 
         log.debug("edit gameserver: {}", existingGameServer);
         existingGameServer = gameServerRepository.save(existingGameServer);
 
-        return convertToDto(existingGameServer);
-    }
+        gameServerDto = convertToDto(existingGameServer);
 
-    private ServerStatusPlugin getMatchingPlugin(String game) {
-        try {
-            log.debug("get server status plugin for game '{}'", game);
-            return pluginManager.getPluginByProvider(game, ServerStatusPlugin.class);
-        } catch (PluginNotFoundException e) {
-            log.debug("no server status plugin for game '{}' installed", game);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "gameserver.no-matching-plugin");
-        }
-    }
-
-    private List<GameServerDto> getServerStatus(List<GameServerDto> gameServerDtos) {
-        return gameServerDtos.parallelStream().map(this::getServerStatus).toList();
-    }
-
-    private GameServerDto getServerStatus(GameServerDto gameServerDto) {
-
-        /* first check if we a value already in the cache */
-        if (serverStatusCache.containsKey(gameServerDto.getId())) {
-            log.debug("cache hit for gameserver {}", gameServerDto.getId());
-
-            ServerStatusDto cachedStatus = serverStatusCache.get(gameServerDto.getId());
-            Duration minRefreshDuration = Duration.parse(config.getServerStatusMinRefreshDuration());
-            Instant lastRefreshed = cachedStatus.getLastRefresh();
-
-            /* check if the status is still up-to-date, return if it is */
-            if (Instant.now().isBefore(lastRefreshed.plus(minRefreshDuration))) {
-                log.debug("cache value for gameserver {} up-to-date, skipping refresh and returning cached value", gameServerDto.getId());
-
-                gameServerDto.setStatus(cachedStatus);
-                return gameServerDto;
-            }
-
-            log.debug("cache value for gameserver {} outdated, forcing refresh", gameServerDto.getId());
-        }
-
-        log.debug("get server status for server {}", gameServerDto);
-        /* find a plugin that is able to provide the server data */
-        ServerStatusPlugin plugin = getMatchingPlugin(gameServerDto.getGame());
-        ServerStatus serverStatus = plugin.getServerStatus(gameServerDto.getHost(), gameServerDto.getPort());
-
-        /* set the last refresh timestamp */
-        ServerStatusDto serverStatusDto = convertToDto(serverStatus);
-        serverStatusDto.setLastRefresh(Instant.now());
-
-        /* put the now up-to-date status in the cache */
-        serverStatusCache.put(gameServerDto.getId(), serverStatusDto);
-
-        log.debug("server status: {}", serverStatus);
-        gameServerDto.setStatus(serverStatusDto);
+        // Reschedule the server status refresh task
+        gameServerStatusService.removeServerStatusRefresh(gameServerDto.getId());
+        gameServerStatusService.scheduleServerStatusRefresh(gameServerDto);
 
         return gameServerDto;
     }
 
-    private void updateServerStatusCache(ServerStatusDto serverStatusDto) {
-
+    @Override
+    public void delete(Long gameServerId) {
+        log.debug("delete gameServer: '{}'", gameServerId);
+        gameServerRepository.deleteById(gameServerId);
+        gameServerStatusService.removeServerStatusRefresh(gameServerId);
     }
 
-    private ServerStatusDto convertToDto(ServerStatus serverStatus) {
-        return mapper.map(serverStatus, ServerStatusDto.class);
+    private List<GameServerDto> getServerStatus(List<GameServerDto> gameServerDtos) {
+        return gameServerDtos.stream().map(this::getServerStatus).toList();
+    }
+
+    private GameServerDto getServerStatus(GameServerDto gameServerDto) {
+        ServerStatusDto serverStatusDto = gameServerStatusService.getServerStatus(gameServerDto);
+        gameServerDto.setStatus(serverStatusDto);
+        return gameServerDto;
     }
 }

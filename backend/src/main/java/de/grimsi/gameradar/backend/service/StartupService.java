@@ -1,5 +1,6 @@
 package de.grimsi.gameradar.backend.service;
 
+import de.grimsi.gameradar.backend.dto.GameServerDto;
 import de.grimsi.gameradar.backend.entity.Privilege;
 import de.grimsi.gameradar.backend.entity.Role;
 import de.grimsi.gameradar.backend.enums.Privileges;
@@ -8,16 +9,17 @@ import de.grimsi.gameradar.backend.repository.PrivilegeRepository;
 import de.grimsi.gameradar.backend.repository.RoleRepository;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class StartupService implements ApplicationListener<ContextRefreshedEvent> {
+public class StartupService {
 
     private boolean alreadySetup = false;
 
@@ -30,8 +32,14 @@ public class StartupService implements ApplicationListener<ContextRefreshedEvent
     @Autowired
     private PrivilegeRepository privilegeRepository;
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    @Autowired
+    private GameServerService gameServerService;
+
+    @Autowired
+    private GameServerStatusService gameServerStatusService;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void setup() {
 
         if (alreadySetup) {
             log.debug("setup already completed");
@@ -44,16 +52,15 @@ public class StartupService implements ApplicationListener<ContextRefreshedEvent
         Privilege superadminApiAccess = createPrivilegeIfNotFound(Privileges.SUPERADMIN_API_ACCESS);
         Privilege adminApiAccess = createPrivilegeIfNotFound(Privileges.ADMIN_API_ACCESS);
         Privilege userApiAccess = createPrivilegeIfNotFound(Privileges.USER_API_ACCESS);
-        Privilege manageTournaments = createPrivilegeIfNotFound(Privileges.MANAGE_TOURNAMENTS);
         Privilege manageGameServers = createPrivilegeIfNotFound(Privileges.MANAGE_GAMESERVERS);
-        Privilege moderateShoutboard = createPrivilegeIfNotFound(Privileges.MODERATE);
 
-        Role superAdminRole = createRoleIfNotFound(Roles.ROLE_SUPERADMIN, Set.of(userApiAccess, superadminApiAccess, adminApiAccess, manageTournaments, manageGameServers, moderateShoutboard));
-        Role adminRole = createRoleIfNotFound(Roles.ROLE_ADMIN, Set.of(userApiAccess, adminApiAccess, manageTournaments, manageGameServers, moderateShoutboard));
-        Role tournamentManagerRole = createRoleIfNotFound(Roles.ROLE_TOURNAMENT_ORGANISER, Set.of(userApiAccess, manageTournaments));
+        Role superAdminRole = createRoleIfNotFound(Roles.ROLE_SUPERADMIN, Set.of(userApiAccess, superadminApiAccess, adminApiAccess, manageGameServers));
+        Role adminRole = createRoleIfNotFound(Roles.ROLE_ADMIN, Set.of(userApiAccess, adminApiAccess, manageGameServers));
         Role gameserverAdminRole = createRoleIfNotFound(Roles.ROLE_GAMESERVER_ADMIN, Set.of(userApiAccess, manageGameServers));
-        Role moderatorRole = createRoleIfNotFound(Roles.ROLE_MODERATOR, Set.of(userApiAccess, moderateShoutboard));
         Role userRole = createRoleIfNotFound(Roles.ROLE_USER, Collections.singleton(userApiAccess));
+
+        /* Schedule all game servers for server status refreshes */
+        scheduleGameServerStatusUpdates();
 
         alreadySetup = true;
     }
@@ -82,6 +89,11 @@ public class StartupService implements ApplicationListener<ContextRefreshedEvent
         role.setName(roleName.name());
         role.setPrivileges(privileges);
         return roleRepository.save(role);
+    }
+
+    private void scheduleGameServerStatusUpdates() {
+        List<GameServerDto> allGameServers = gameServerService.getAll();
+        allGameServers.forEach((server) -> gameServerStatusService.scheduleServerStatusRefresh(server));
     }
 }
 
