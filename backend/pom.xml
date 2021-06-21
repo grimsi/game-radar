@@ -13,7 +13,7 @@
     <groupId>de.grimsi.gameradar</groupId>
     <artifactId>backend</artifactId>
     <version>0.3.0</version>
-    <name>backend</name>
+    <name>Game-Radar</name>
     <description>A docker-native game-server-discovery application for your LAN-Party!</description>
     <packaging>jar</packaging>
 

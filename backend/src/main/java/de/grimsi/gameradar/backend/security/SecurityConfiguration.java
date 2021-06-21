@@ -46,7 +46,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
 
         // Allow GET-Requests on *all* URLs (Frontend will handle 404 and permission)
-        // except paths under "/v1" (because that's where the backend is reachable
+        // except paths under "/v1" (because that's where the backend is reachable)
         // but allow the login, setup and password reset endpoints
         // Deny the other HTTP methods on all paths
         http.authorizeRequests()
