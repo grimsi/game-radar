@@ -18,13 +18,13 @@ import java.util.Optional;
 @RequestMapping("/v1/gameservers")
 public interface GameServerApi {
 
-    @ApiOperation(value = "Get all game servers", authorizations = {@Authorization(value = "auth")})
+    @ApiOperation(value = "Get all game servers")
     @GetMapping(produces = {"application/json"})
     ResponseEntity<List<GameServerDto>> getGameServers(
             @ApiParam(name = "host", value = "The server host.")
             @RequestParam(required = false) Optional<String> host);
 
-    @ApiOperation(value = "Get all game servers with status", authorizations = {@Authorization(value = "auth")})
+    @ApiOperation(value = "Get all game servers with status")
     @GetMapping(value = "/status", produces = {"application/json"})
     ResponseEntity<List<GameServerDto>> getGameServerStatuses(
             @ApiParam(name = "host", value = "The server host.")

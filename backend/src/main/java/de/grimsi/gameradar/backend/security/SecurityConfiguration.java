@@ -48,10 +48,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Allow GET-Requests on *all* URLs (Frontend will handle 404 and permission)
         // except paths under "/v1" (because that's where the backend is reachable)
         // but allow the login, setup and password reset endpoints
+        // also allow the gameserver query endpoints since they should be public
         // Deny the other HTTP methods on all paths
         http.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/v1/login/**", "/v1/setup").permitAll()
                 .antMatchers(HttpMethod.GET, "/v1/login/requestPasswordReset/**", "/v1/login/resetPassword/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/v1/gameservers/**").permitAll()
                 .antMatchers("/v1/**").authenticated()
                 .antMatchers(HttpMethod.GET).permitAll()
                 .anyRequest().denyAll();
