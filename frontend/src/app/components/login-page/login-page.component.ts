@@ -4,7 +4,8 @@ import {FormBuilder} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {UserService} from '../../services/user.service';
 import {ApiErrorResponse} from '../../models/dtos/ApiErrorResponse';
-import {environment} from '../../../environments/environment';
+import {MatProgressButtonOptions} from 'mat-progress-buttons';
+import {environment} from "../../../environments/environment";
 
 @Component({
   templateUrl: 'login-page.component.html',
@@ -12,13 +13,26 @@ import {environment} from '../../../environments/environment';
 })
 export class LoginPageComponent implements OnInit {
 
-  version: string = environment.version;
+  version: string = environment.VERSION;
 
   returnUrl: string = "";
   error: string = "";
 
   username: string = "";
   password: string = "";
+
+  loginButton: MatProgressButtonOptions = {
+    active: false,
+    text: 'Login',
+    spinnerSize: 18,
+    raised: true,
+    stroked: false,
+    buttonColor: 'primary',
+    spinnerColor: 'accent',
+    fullWidth: false,
+    disabled: false,
+    mode: 'indeterminate',
+  };
 
   constructor(
     private formBuilder: FormBuilder,

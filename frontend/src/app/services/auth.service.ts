@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {LoginApi} from '../api/LoginApi';
-import {HttpClient, HttpResponse} from '@angular/common/http';
 import {AuthBody} from '../models/objects/AuthBody';
 import {Observable} from 'rxjs';
 import {JwtHelperService} from '@auth0/angular-jwt';
 import {Router} from '@angular/router';
 import {UserService} from './user.service';
+import {HttpClient, HttpResponse} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'

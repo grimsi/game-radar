@@ -1,5 +1,11 @@
 import {Component, OnInit} from '@angular/core';
+import {NavMenuItem} from '../../models/objects/NavMenuItem';
 import {Title} from '@angular/platform-browser';
+import {Config} from '../../config/Config';
+import {Icon} from '../../models/enums/Icon';
+import {UserService} from '../../services/user.service';
+import {AuthService} from '../../services/auth.service';
+import {DropDownMenuItem} from "../../models/objects/DropDownMenuItem";
 
 @Component({
   selector: 'app-header',
@@ -8,10 +14,34 @@ import {Title} from '@angular/platform-browser';
 })
 export class HeaderComponent implements OnInit {
 
-  constructor(private titleService: Title) {
+  tabNavItems: NavMenuItem[] = [
+    new NavMenuItem('Servers', Icon.dns, '/servers', true),
+    new NavMenuItem('Events', Icon.list_alt, '/events', true),
+    new NavMenuItem('Results', Icon.directions_car, '/results', false),
+    new NavMenuItem('Logs', Icon.description, '/logs', false),
+    new NavMenuItem('Info', Icon.info, '/info', true)
+  ];
+
+  dropDownItems: DropDownMenuItem[] = [
+    new DropDownMenuItem('Log out', Icon.lock_open, () => {
+      this.authService.logout();
+    }, true)
+  ];
+
+  activeItem: NavMenuItem | undefined;
+  userService: UserService;
+
+  constructor(private titleService: Title,
+              userService: UserService,
+              private authService: AuthService) {
+    this.userService = userService;
   }
 
   ngOnInit() {
-    this.titleService.setTitle("Game-Radar");
+  }
+
+  setActiveItem(item: NavMenuItem) {
+    this.activeItem = item;
+    this.titleService.setTitle(`${Config.baseTitle} - ${item.title}`);
   }
 }

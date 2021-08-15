@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { LogoutPageComponent } from './logout-page.component';
+import { ErrorDialogComponent } from './error-dialog.component';
 
-describe('LogoutPageComponent', () => {
-  let component: LogoutPageComponent;
-  let fixture: ComponentFixture<LogoutPageComponent>;
+describe('ErrorDialogComponent', () => {
+  let component: ErrorDialogComponent;
+  let fixture: ComponentFixture<ErrorDialogComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LogoutPageComponent ]
+      declarations: [ ErrorDialogComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LogoutPageComponent);
+    fixture = TestBed.createComponent(ErrorDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
