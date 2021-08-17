@@ -19,6 +19,14 @@ const appRoutes: Routes = [
         component: NotImplementedComponent
       },
       {
+        path: 'info',
+        component: NotImplementedComponent
+      },
+      {
+        path: 'config',
+        component: NotImplementedComponent
+      },
+      {
         path: '',
         redirectTo: '/servers',
         pathMatch: 'full'

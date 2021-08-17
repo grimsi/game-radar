@@ -11,6 +11,7 @@ export enum Icon {
   pause = 'pause',
   error = 'error',
   sync_problem = 'sync_problem',
+  settings = 'settings',
   add = 'add',
   edit = 'edit',
   delete = 'delete',
