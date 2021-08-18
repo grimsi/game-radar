@@ -1,3 +1,6 @@
+import packageInfo from 'package.json';
+
 export const environment = {
-  production: true
+  production: true,
+  VERSION: packageInfo.version
 };

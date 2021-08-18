@@ -15,5 +15,6 @@ export enum Icon {
   add = 'add',
   edit = 'edit',
   delete = 'delete',
-  remove = 'remove'
+  remove = 'remove',
+  controller = 'sports_esports'
 }

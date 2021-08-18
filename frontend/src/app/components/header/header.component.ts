@@ -16,8 +16,9 @@ export class HeaderComponent implements OnInit {
 
   tabNavItems: NavMenuItem[] = [
     new NavMenuItem('Servers', Icon.dns, '/servers', true),
+    new NavMenuItem('Games', Icon.controller, '/games', true),
     new NavMenuItem('Info', Icon.info, '/info', true),
-    new NavMenuItem('Config', Icon.settings, '/config', true)
+    new NavMenuItem('Config', Icon.settings, '/config', true),
   ];
 
   dropDownItems: DropDownMenuItem[] = [

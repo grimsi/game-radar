@@ -19,6 +19,10 @@ const appRoutes: Routes = [
         component: NotImplementedComponent
       },
       {
+        path: 'games',
+        component: NotImplementedComponent
+      },
+      {
         path: 'info',
         component: NotImplementedComponent
       },
