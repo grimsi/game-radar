@@ -54,6 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/v1/login/**", "/v1/setup").permitAll()
                 .antMatchers(HttpMethod.GET, "/v1/login/requestPasswordReset/**", "/v1/login/resetPassword/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/v1/gameservers/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/v1/info/**").permitAll()
                 .antMatchers("/v1/**").authenticated()
                 .antMatchers(HttpMethod.GET).permitAll()
                 .anyRequest().denyAll();

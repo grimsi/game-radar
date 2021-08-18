@@ -3,6 +3,7 @@ package de.grimsi.gameradar.backend.controller;
 import de.grimsi.gameradar.backend.api.SetupApi;
 import de.grimsi.gameradar.backend.dto.UserDto;
 import de.grimsi.gameradar.backend.enums.Roles;
+import de.grimsi.gameradar.backend.service.ApplicationManagementService;
 import de.grimsi.gameradar.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,9 +18,12 @@ public class SetupApiController implements SetupApi {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ApplicationManagementService applicationManagementService;
+
     @Override
     public ResponseEntity<UserDto> registerAdmin(UserDto body) {
-        if (userService.getUserCount("SUPERADMIN") > 0) {
+        if (applicationManagementService.isApplicationSetupComplete()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 

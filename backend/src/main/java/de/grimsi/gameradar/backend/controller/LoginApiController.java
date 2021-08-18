@@ -3,6 +3,7 @@ package de.grimsi.gameradar.backend.controller;
 import de.grimsi.gameradar.backend.api.LoginApi;
 import de.grimsi.gameradar.backend.dto.UserDto;
 import de.grimsi.gameradar.backend.enums.Roles;
+import de.grimsi.gameradar.backend.service.ApplicationManagementService;
 import de.grimsi.gameradar.backend.service.PasswordResetService;
 import de.grimsi.gameradar.backend.service.UserService;
 import de.grimsi.gameradar.backend.service.UtilityService;
@@ -27,6 +28,9 @@ public class LoginApiController implements LoginApi {
     private PasswordResetService passwordResetService;
 
     @Autowired
+    private ApplicationManagementService applicationManagementService;
+
+    @Autowired
     private UtilityService utilityService;
 
     @Override
@@ -36,7 +40,7 @@ public class LoginApiController implements LoginApi {
 
     @Override
     public ResponseEntity<UserDto> register(UserDto body) {
-        if (userService.getUserCount("SUPERADMIN") < 1) {
+        if (!applicationManagementService.isApplicationSetupComplete()) {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Location", "/v1/setup");
             return new ResponseEntity<>(headers, HttpStatus.TEMPORARY_REDIRECT);

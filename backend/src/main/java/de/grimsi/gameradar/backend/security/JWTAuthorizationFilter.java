@@ -68,7 +68,9 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                     return new UsernamePasswordAuthenticationToken(user, null, authorities);
                 }
             } catch (SignatureVerificationException | IllegalArgumentException | TokenExpiredException | JWTDecodeException e) {
-                log.warn("Error verifying JWT: {}", e.getMessage());
+                // Usually it's never a good idea to log sensitive data (in this case a token),
+                // but since the token is invalid it should not be a problem
+                log.warn("Error verifying JWT:\nToken: {}\nError: {}", token, e.getMessage());
             }
             return null;
         }

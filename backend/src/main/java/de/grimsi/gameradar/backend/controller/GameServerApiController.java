@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class GameServerController implements GameServerApi {
+public class GameServerApiController implements GameServerApi {
 
     @Autowired
     GameServerService gameServerService;

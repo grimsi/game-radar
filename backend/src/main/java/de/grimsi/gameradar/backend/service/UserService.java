@@ -4,6 +4,7 @@ import de.grimsi.gameradar.backend.configuration.ApplicationProperties;
 import de.grimsi.gameradar.backend.dto.UserDto;
 import de.grimsi.gameradar.backend.entity.Role;
 import de.grimsi.gameradar.backend.entity.User;
+import de.grimsi.gameradar.backend.enums.Roles;
 import de.grimsi.gameradar.backend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,10 +143,12 @@ public class UserService extends DatabaseService<User, UserDto, UserRepository> 
         return save(convertToDto(user));
     }
 
-    public int getUserCount(String roleName) {
+    public int getUserCount(Roles role) {
+        String roleName = role.name().replace("ROLE_", "");
+
         log.debug("get user count for role '{}'", roleName);
         return (int) userRepository.findAll().stream().filter(
-                user -> user.getRoles().stream().anyMatch(role -> role.getName().equals(roleName))
+                user -> user.getRoles().stream().anyMatch(r -> r.getName().equals(roleName))
         ).count();
     }
 }
