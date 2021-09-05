@@ -7,6 +7,7 @@ import {LogoutPageComponent} from "./components/logout-page/logout-page.componen
 import {PageNotFoundComponent} from "./components/page-not-found/page-not-found.component";
 import {NavbarLayoutComponent} from "./layouts/navbar-layout/navbar-layout.component";
 import {NotImplementedComponent} from "./components/not-implemented/not-implemented.component";
+import {SetupPageComponent} from "./components/setup-page/setup-page.component";
 
 const appRoutes: Routes = [
   {
@@ -42,6 +43,10 @@ const appRoutes: Routes = [
     component: FullpageLayoutComponent,
     children: [
       {
+        path: 'setup',
+        component: SetupPageComponent
+      },
+      {
         path: 'login',
         component: LoginPageComponent
       },
@@ -51,7 +56,7 @@ const appRoutes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/login',
+        redirectTo: '/setup',
         pathMatch: 'full'
       }
     ]

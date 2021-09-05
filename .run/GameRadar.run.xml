@@ -11,4 +11,16 @@
       <option name="Make" enabled="true" />
     </method>
   </configuration>
+  <configuration default="false" name="GameRadar" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="backend" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="org.springframework.boot.loader.PropertiesLauncher" />
+    <option name="ENABLE_JMX_AGENT" value="false" />
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <option name="VM_PARAMETERS" value="-Dspring.config.name=application,mail,database,gameradar,secure" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <option name="SHORTEN_COMMAND_LINE" value="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
 </component>

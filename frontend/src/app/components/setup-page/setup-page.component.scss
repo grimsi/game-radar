@@ -1,0 +1,24 @@
+#login-card {
+  min-width: 300px;
+  width: 20%;
+}
+
+#login-card > mat-card-header {
+  text-align: center;
+  margin-bottom: 25px;
+  margin-top: 25px;
+}
+
+#login-card > mat-card-content > form > .mat-card-subtitle {
+  text-align: center;
+}
+
+.full-page {
+  height: 100vh;
+  width: 100vw;
+}
+
+.login-background {
+  background: url('~src/assets/graphics/setup-background.jpg') no-repeat center center fixed;
+  background-size: cover;
+}

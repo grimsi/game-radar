@@ -5,22 +5,12 @@
     </mat-card-header>
     <mat-card-content>
       <form (submit)="login()" fxLayout="column" fxLayoutAlign="center center">
-        <table>
-          <tr>
-            <td>
-              <mat-form-field>
-                <input matInput placeholder="Username" [(ngModel)]="username" name="username" required>
-              </mat-form-field>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <mat-form-field>
-                <input matInput placeholder="Password" [(ngModel)]="password" type="password" name="password" required>
-              </mat-form-field>
-            </td>
-          </tr>
-        </table>
+        <mat-form-field>
+          <input matInput placeholder="Username" [(ngModel)]="username" name="username" required>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Password" [(ngModel)]="password" type="password" name="password" required>
+        </mat-form-field>
         <span class="mat-error mat-card-subtitle" [hidden]="!error">{{error}}</span>
         <mat-card-actions>
           <mat-spinner-button

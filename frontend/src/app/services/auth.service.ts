@@ -38,6 +38,10 @@ export class AuthService implements LoginApi {
     return this.http.post<Response>(this.apiPath, new AuthBody(username, password), {observe: 'response'});
   }
 
+  public setup(username: string, password: string, email: string) {
+    return this.http.post('/setup', {username: username, password: password, email: email}, {observe: 'response'});
+  }
+
   public logout(redirect: boolean = true): void {
     if (redirect) {
       this.router.navigate(['/logout']);

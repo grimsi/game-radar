@@ -28,6 +28,7 @@ import {MatDialogModule} from "@angular/material/dialog";
 import {MatButtonModule} from "@angular/material/button";
 import {MatInputModule} from "@angular/material/input";
 import {FlexModule} from "@angular/flex-layout";
+import { SetupPageComponent } from './components/setup-page/setup-page.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import {FlexModule} from "@angular/flex-layout";
     LogoutPageComponent,
     PageNotFoundComponent,
     NotImplementedComponent,
-    ErrorDialogComponent
+    ErrorDialogComponent,
+    SetupPageComponent
   ],
   imports: [
     BrowserModule,

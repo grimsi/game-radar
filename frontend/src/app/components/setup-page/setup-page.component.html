@@ -1,0 +1,44 @@
+<div fxLayoutAlign="center center" class="login-background full-page" xmlns="http://www.w3.org/1999/html">
+  <mat-card id="login-card" fxLayout="column" fxLayoutAlign="center center">
+
+    <mat-card-header>
+      <mat-card-title>Hello there!</mat-card-title>
+      <mat-card-subtitle>We need to set up some things.<br/>Let's start by creating the initial admin user:
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form (submit)="setup()" fxLayout="column" fxLayoutAlign="center center" #loginForm="ngForm">
+        <mat-form-field>
+          <input matInput placeholder="E-Mail" [(ngModel)]="email" type="email" name="email" email required>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Username" [(ngModel)]="username" name="username" required>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Password" [(ngModel)]="password" type="password" name="password" required>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Confirm password" [(ngModel)]="confirmPassword" type="password"
+                 name="confirm-password" required>
+        </mat-form-field>
+
+        <p class="mat-error mat-card-subtitle" *ngIf="!(password == confirmPassword)">Passwords do not match.</p>
+        <p class="mat-error mat-card-subtitle" [hidden]="!error" [innerHTML]="error"></p>
+
+        <mat-card-actions>
+
+          <mat-spinner-button
+            type="submit"
+            [options]="setupButton"
+            [disabled]="!(loginForm.form.valid && (password == confirmPassword))"
+            [active]="setupButton.active || false">
+          </mat-spinner-button>
+        </mat-card-actions>
+      </form>
+    </mat-card-content>
+
+    <mat-card-subtitle fxFlexAlign="end end">Version: {{version}}</mat-card-subtitle>
+
+  </mat-card>
+</div>
