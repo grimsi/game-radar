@@ -50,9 +50,11 @@ export class SetupPageComponent implements OnInit {
   }
 
   ngOnInit() {
+
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['']);
     }
+
     this.infoService.version().subscribe(
       (backendVersion: string) => {
         this.version = backendVersion;

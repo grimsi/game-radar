@@ -6,6 +6,7 @@ import {UserService} from '../../services/user.service';
 import {ApiErrorResponse} from '../../models/dtos/ApiErrorResponse';
 import {MatProgressButtonOptions} from 'mat-progress-buttons';
 import {environment} from "../../../environments/environment";
+import {InfoService} from "../../services/info.service";
 
 @Component({
   templateUrl: 'login-page.component.html',
@@ -39,14 +40,25 @@ export class LoginPageComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private infoService: InfoService
   ) {
   }
 
   ngOnInit() {
     if (this.authService.isAuthenticated()) {
+
       this.router.navigate(['']);
     }
+
+    this.infoService.version().subscribe(
+      (backendVersion: string) => {
+        this.version = backendVersion;
+      },
+      (error: any) => {
+        this.version = environment.VERSION;
+      }
+    );
   }
 
   public login(): void {

@@ -1,15 +1,19 @@
-#login-card {
+#setup-card {
+  padding-top: 7.5vh;
+  padding-bottom: 7.5vh;
   min-width: 300px;
   width: 20%;
+  backdrop-filter: blur(10px);
+  background-color: #222222dd;
 }
 
-#login-card > mat-card-header {
+#setup-card > mat-card-header {
   text-align: center;
   margin-bottom: 25px;
   margin-top: 25px;
 }
 
-#login-card > mat-card-content > form > .mat-card-subtitle {
+#setup-card > mat-card-content > form > .mat-card-subtitle {
   text-align: center;
 }
 
@@ -18,7 +22,7 @@
   width: 100vw;
 }
 
-.login-background {
-  background: url('~src/assets/graphics/setup-background.jpg') no-repeat center center fixed;
+.setup-background {
   background-size: cover;
+  background: #101010 url('~src/assets/graphics/game-radar-background.svg') no-repeat fixed center center;
 }

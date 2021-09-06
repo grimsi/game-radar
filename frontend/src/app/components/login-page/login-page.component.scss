@@ -1,6 +1,10 @@
 #login-card {
+  padding-top: 7.5vh;
+  padding-bottom: 7.5vh;
   min-width: 300px;
   width: 20%;
+  backdrop-filter: blur(10px);
+  background-color: #222222dd;
 }
 
 .full-page {
@@ -9,6 +13,6 @@
 }
 
 .login-background {
-  background: url('~src/assets/graphics/login-background.jpg') no-repeat center center fixed;
   background-size: cover;
+  background: #101010 url('~src/assets/graphics/game-radar-background.svg') no-repeat fixed center center;
 }

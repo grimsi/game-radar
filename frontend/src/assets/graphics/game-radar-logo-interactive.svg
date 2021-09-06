@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 288">
+  <title>Game-Radar Logo</title>
+  <style>
+
+    polygon {
+      fill: #fff;
+      pointer-events: visible;
+    }
+
+    polygon:hover {
+      fill: #4caf50; /* Material green theme primary color */
+    }
+  </style>
+  <polygon points="256 0 234 0 234 24.75 256 0"/>
+  <polygon points="324 0 234 80 234 288 306 288 306 144 432 144 450 0 324 0"/>
+  <polygon points="324 162 396 162 450 288 378 288 324 162"/>
+  <polygon points="72 72 192 72 216 45 216 0 0 0 0 288 72 207 72 72"/>
+  <polygon points="144 160 144 216 81 216 0 288 216 288 216 144 162 144 144 160"/>
+</svg>
