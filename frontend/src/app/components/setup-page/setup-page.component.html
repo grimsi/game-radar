@@ -8,7 +8,7 @@
     </mat-card-header>
 
     <mat-card-content>
-      <form (submit)="setup()" fxLayout="column" fxLayoutAlign="center center" #loginForm="ngForm">
+      <form (submit)="setup()" fxLayout="column" fxLayoutAlign="center center" #setupForm="ngForm">
         <mat-form-field>
           <input matInput placeholder="E-Mail" [(ngModel)]="email" type="email" name="email" email required>
         </mat-form-field>
@@ -31,7 +31,7 @@
           <mat-spinner-button
             type="submit"
             [options]="setupButton"
-            [disabled]="!(loginForm.form.valid && (password == confirmPassword))"
+            [disabled]="!(setupForm.form.valid && (password == confirmPassword))"
             [active]="setupButton.active || false">
           </mat-spinner-button>
         </mat-card-actions>

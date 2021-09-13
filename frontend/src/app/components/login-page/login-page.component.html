@@ -4,7 +4,7 @@
       <mat-card-title>Login</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <form (submit)="login()" fxLayout="column" fxLayoutAlign="center center">
+      <form (submit)="login()" fxLayout="column" fxLayoutAlign="center center" #loginForm="ngForm">
         <mat-form-field>
           <input matInput placeholder="Username" [(ngModel)]="username" name="username" required>
         </mat-form-field>
@@ -15,7 +15,9 @@
         <mat-card-actions>
           <mat-spinner-button
             type="submit"
-            [options]="loginButton">
+            [options]="loginButton"
+            [disabled]="!(loginForm.form.valid)"
+            [active]="loginButton.active || false">
           </mat-spinner-button>
         </mat-card-actions>
       </form>

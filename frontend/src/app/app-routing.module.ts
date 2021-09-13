@@ -56,7 +56,7 @@ const appRoutes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/setup',
+        redirectTo: '/login',
         pathMatch: 'full'
       }
     ]

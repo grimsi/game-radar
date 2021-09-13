@@ -1,7 +1,5 @@
-import {Observable} from 'rxjs';
-
 export interface InfoApi {
-  isSetup(): Observable<boolean>;
+  isSetup(): Promise<boolean>;
 
-  version(): Observable<string>;
+  version(): Promise<string>;
 }

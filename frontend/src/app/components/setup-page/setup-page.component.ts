@@ -7,7 +7,6 @@ import {UserService} from "../../services/user.service";
 import {ApiErrorResponse} from "../../models/dtos/ApiErrorResponse";
 import {Config} from "../../config/Config";
 import {InfoService} from "../../services/info.service";
-import {environment} from "../../../environments/environment";
 
 @Component({
   selector: 'app-setup-page',
@@ -18,7 +17,6 @@ export class SetupPageComponent implements OnInit {
 
   version: string = "Loading...";
 
-  returnUrl: string = "";
   error: string = "";
 
   username: string = "";
@@ -28,7 +26,7 @@ export class SetupPageComponent implements OnInit {
 
   setupButton: MatProgressButtonOptions = {
     active: false,
-    text: 'Login',
+    text: 'Finish setup',
     spinnerSize: 18,
     raised: true,
     stroked: false,
@@ -49,30 +47,28 @@ export class SetupPageComponent implements OnInit {
   ) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
 
-    if (this.authService.isAuthenticated()) {
-      this.router.navigate(['']);
+    if (await this.infoService.isSetup()) {
+      this.router
+        .navigate([''])
+        .catch(e => console.error(e));
     }
 
-    this.infoService.version().subscribe(
-      (backendVersion: string) => {
-        this.version = backendVersion;
-      },
-      (error: any) => {
-        this.version = environment.VERSION;
-      }
-    );
+    this.infoService.version().then((version: string) => this.version = version);
   }
 
   public setup(): void {
+    this.error = "";
     this.setupButton.active = true;
 
     this.authService.setup(this.username, this.password, this.email)
       .subscribe(
-        (response: any) => {
+        () => {
           this.setupButton.active = false;
-          this.router.navigate(['']);
+          this.router
+            .navigate([''])
+            .catch(e => console.error(e));
         },
         (error: ApiErrorResponse) => {
           this.setupButton.active = false;
@@ -82,7 +78,9 @@ export class SetupPageComponent implements OnInit {
               this.error = 'The application has already been set up.<br/>Redirecting you to the login...';
               setTimeout(
                 () => {
-                  this.router.navigate(['/login']);
+                  this.router
+                    .navigate(['/login'])
+                    .catch(e => console.error(e));
                 },
                 Config.logoutRedirectTimeout
               );

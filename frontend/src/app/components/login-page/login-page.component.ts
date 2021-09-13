@@ -5,16 +5,16 @@ import {AuthService} from '../../services/auth.service';
 import {UserService} from '../../services/user.service';
 import {ApiErrorResponse} from '../../models/dtos/ApiErrorResponse';
 import {MatProgressButtonOptions} from 'mat-progress-buttons';
-import {environment} from "../../../environments/environment";
 import {InfoService} from "../../services/info.service";
 
 @Component({
-  templateUrl: 'login-page.component.html',
+  selector: 'app-login-page',
+  templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.scss']
 })
 export class LoginPageComponent implements OnInit {
 
-  version: string = environment.VERSION;
+  version: string = "Loading...";
 
   returnUrl: string = "";
   error: string = "";
@@ -45,33 +45,34 @@ export class LoginPageComponent implements OnInit {
   ) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     if (this.authService.isAuthenticated()) {
-
-      this.router.navigate(['']);
+      this.router
+        .navigate([''])
+        .catch(e => console.error(e));
     }
 
-    this.infoService.version().subscribe(
-      (backendVersion: string) => {
-        this.version = backendVersion;
-      },
-      (error: any) => {
-        this.version = environment.VERSION;
-      }
-    );
+    this.version = await this.infoService.version();
   }
 
   public login(): void {
+    this.error = "";
+    this.loginButton.active = true;
+
     this.authService.login(this.username, this.password)
       .subscribe(
         (response: any) => {
+          this.loginButton.active = false;
           const token = response.headers.get('Authorization');
           const returnUrl: string = this.route.snapshot.queryParamMap.get('returnUrl') || '';
           this.authService.setToken(token);
           this.userService.userName = this.username;
-          this.router.navigate([returnUrl]);
+          this.router
+            .navigate([returnUrl])
+            .catch(e => console.error(e));
         },
         (error: ApiErrorResponse) => {
+          this.loginButton.active = false;
           if (error.status === 401) {
             this.error = `The username or password you entered is incorrect.`;
           }
