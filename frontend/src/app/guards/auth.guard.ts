@@ -19,7 +19,7 @@ export class AuthGuard implements CanActivate {
     if (!await this.infoService.isSetup()) {
 
       this.router
-        .navigate(['/setup'])
+        .navigateByUrl('/setup')
         .catch(e => console.error(e));
 
       return false;
@@ -32,7 +32,7 @@ export class AuthGuard implements CanActivate {
     } else {
 
       this.router
-        .navigate(['/login'], {queryParams: {returnUrl: window.location.pathname}})
+        .navigate(['login'], {queryParams: {returnUrl: window.location.pathname}})
         .catch(e => console.error(e));
 
       return false;

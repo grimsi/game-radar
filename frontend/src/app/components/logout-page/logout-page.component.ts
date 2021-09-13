@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Config } from 'src/app/config/Config';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {Config} from 'src/app/config/Config';
 
 @Component({
   templateUrl: './logout-page.component.html',
@@ -14,7 +14,9 @@ export class LogoutPageComponent implements OnInit {
   ngOnInit() {
     setTimeout(
       () => {
-        this.router.navigate(['/login']);
+        this.router
+          .navigateByUrl('/login')
+          .catch(e => console.error(e));
       },
       Config.logoutRedirectTimeout
     );

@@ -44,7 +44,9 @@ export class AuthService implements LoginApi {
 
   public logout(redirect: boolean = true): void {
     if (redirect) {
-      this.router.navigate(['/logout']);
+      this.router
+        .navigateByUrl('/logout')
+        .catch(e => console.error(e));
     }
     localStorage.removeItem(this.tokenStorageKey);
     this.userService.removeKey();

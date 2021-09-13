@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {FormBuilder} from '@angular/forms';
 import {AuthService} from '../../services/auth.service';
 import {UserService} from '../../services/user.service';
 import {ApiErrorResponse} from '../../models/dtos/ApiErrorResponse';
@@ -36,7 +35,6 @@ export class LoginPageComponent implements OnInit {
   };
 
   constructor(
-    private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
@@ -48,7 +46,7 @@ export class LoginPageComponent implements OnInit {
   async ngOnInit() {
     if (this.authService.isAuthenticated()) {
       this.router
-        .navigate([''])
+        .navigateByUrl('')
         .catch(e => console.error(e));
     }
 
@@ -68,7 +66,7 @@ export class LoginPageComponent implements OnInit {
           this.authService.setToken(token);
           this.userService.userName = this.username;
           this.router
-            .navigate([returnUrl])
+            .navigateByUrl(returnUrl)
             .catch(e => console.error(e));
         },
         (error: ApiErrorResponse) => {

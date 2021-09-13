@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {MatProgressButtonOptions} from "mat-progress-buttons";
-import {FormBuilder} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {UserService} from "../../services/user.service";
@@ -38,7 +37,6 @@ export class SetupPageComponent implements OnInit {
   };
 
   constructor(
-    private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
@@ -51,7 +49,7 @@ export class SetupPageComponent implements OnInit {
 
     if (await this.infoService.isSetup()) {
       this.router
-        .navigate([''])
+        .navigateByUrl('')
         .catch(e => console.error(e));
     }
 
@@ -67,7 +65,7 @@ export class SetupPageComponent implements OnInit {
         () => {
           this.setupButton.active = false;
           this.router
-            .navigate([''])
+            .navigateByUrl('')
             .catch(e => console.error(e));
         },
         (error: ApiErrorResponse) => {
@@ -79,7 +77,7 @@ export class SetupPageComponent implements OnInit {
               setTimeout(
                 () => {
                   this.router
-                    .navigate(['/login'])
+                    .navigateByUrl('/login')
                     .catch(e => console.error(e));
                 },
                 Config.logoutRedirectTimeout
