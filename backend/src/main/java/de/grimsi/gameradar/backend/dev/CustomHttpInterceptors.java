@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Profile("dev")
+@Profile("latency")
 @Configuration
 public class CustomHttpInterceptors implements WebMvcConfigurer {
-    
+
     @Autowired
     private LatencyInducingRequestInterceptor latencyInducingRequestInterceptor;
 

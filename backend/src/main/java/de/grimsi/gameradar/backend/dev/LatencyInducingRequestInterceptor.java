@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Duration;
 
-@Profile("dev")
+@Profile("latency")
 @Component
 @Slf4j
 public class LatencyInducingRequestInterceptor implements HandlerInterceptor {
