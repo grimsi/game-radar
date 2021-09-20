@@ -1,4 +1,4 @@
-package de.grimsi.gameradar.backend.dev;
+package de.grimsi.gameradar.backend.dev.latency;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

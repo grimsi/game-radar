@@ -12,13 +12,10 @@ public class InfoApiController implements InfoApi {
     @Autowired
     private ApplicationManagementService applicationManagementService;
 
-    @Override
     public ResponseEntity<Boolean> isSetup() {
         return ResponseEntity.ok(applicationManagementService.isApplicationSetupComplete());
     }
-
-
-    @Override
+    
     public ResponseEntity<String> version() {
         return ResponseEntity.ok(applicationManagementService.getApplicationVersion());
     }

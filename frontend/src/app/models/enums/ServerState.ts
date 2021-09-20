@@ -1,0 +1,6 @@
+export enum ServerState {
+  STOPPED = 'STOPPED',
+  RUNNING = 'RUNNING',
+  RESTARTING = 'RESTARTING',
+  UNKNOWN = 'UNKNOWN'
+}

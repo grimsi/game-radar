@@ -1,0 +1,64 @@
+<div class="mat-elevation-z8">
+  <table mat-table class="full-width-table" [dataSource]="dataSource" aria-label="Gameserver Table"
+         matSort matSortActive="name" matSortDirection="desc">
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Server Name</th>
+      <td mat-cell *matCellDef="let row">{{row.name}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="address">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Host</th>
+      <td mat-cell *matCellDef="let row">
+        <pre>{{row.host}}:{{row.port}}</pre>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="game">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Game</th>
+      <td mat-cell *matCellDef="let row">{{row.game}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+      <td mat-cell *matCellDef="let row">{{row.status}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="players">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Players</th>
+      <td mat-cell *matCellDef="let row">{{row.currentPlayers}}/{{row.maxPlayers}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="map">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="">Gamemode - Map</th>
+      <td mat-cell *matCellDef="let row">{{row.currentGamemode}} - {{row.currentMap}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="lastRefresh">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Refresh</th>
+      <td mat-cell *matCellDef="let row">{{row.lastRefresh}}</td>
+    </ng-container>
+
+    <!--
+    <ng-container matColumnDef="state">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
+      <td mat-cell *matCellDef="let row">
+        <button mat-icon-button disabled>
+          <mat-icon disabled [matTooltip]="row.state.toLowerCase()"
+                    matTooltipPosition="after">{{utils.mapServerStateToIcon(row.state)}}</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    -->
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-paginator #paginator
+                 [length]="dataSource.data.length"
+                 [pageIndex]="0"
+                 [pageSize]="25"
+                 [pageSizeOptions]="[5, 25, 50, 100]">
+  </mat-paginator>
+</div>

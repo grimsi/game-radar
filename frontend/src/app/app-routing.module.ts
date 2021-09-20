@@ -8,6 +8,7 @@ import {PageNotFoundComponent} from "./components/page-not-found/page-not-found.
 import {NavbarLayoutComponent} from "./layouts/navbar-layout/navbar-layout.component";
 import {NotImplementedComponent} from "./components/not-implemented/not-implemented.component";
 import {SetupPageComponent} from "./components/setup-page/setup-page.component";
+import {GameserverListComponent} from "./components/gameserver-list/gameserver-list.component";
 
 const appRoutes: Routes = [
   {
@@ -17,7 +18,7 @@ const appRoutes: Routes = [
     children: [
       {
         path: 'servers',
-        component: NotImplementedComponent
+        component: GameserverListComponent
       },
       {
         path: 'games',

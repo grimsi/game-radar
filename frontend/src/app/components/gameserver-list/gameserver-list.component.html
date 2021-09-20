@@ -1,0 +1,15 @@
+<div fxFlexFill>
+  <div class="fullscreen-overlay" *ngIf="this.loading" fxLayout="column" fxLayoutAlign="center center">
+    <mat-spinner></mat-spinner>
+    <h2>Loading servers...</h2>
+  </div>
+  <div fxLayout="row" fxLayoutAlign="center center">
+    <div *ngIf="!this.loading && this.gameServers.length === 0">
+      <h2>No servers found.</h2>
+    </div>
+    <gameserver-table *ngIf="!this.loading && this.gameServers.length > 0"
+                      [data]="gameServers"
+                      fxFlex="80"
+                      style="margin-top: 25px;"></gameserver-table>
+  </div>
+</div>

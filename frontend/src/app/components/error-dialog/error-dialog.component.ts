@@ -8,8 +8,8 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
     <mat-dialog-content>
       {{message}}
     </mat-dialog-content>
-    <mat-dialog-actions>
-      <button mat-raised-button color="warn" (click)="onClick()">OK</button>
+    <mat-dialog-actions style="justify-content: end">
+      <button mat-raised-button color="primary" (click)="onClick()">OK</button>
     </mat-dialog-actions>
   `
 })

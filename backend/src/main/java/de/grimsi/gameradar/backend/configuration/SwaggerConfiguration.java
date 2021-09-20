@@ -32,8 +32,8 @@ public class SwaggerConfiguration {
 
     private ApiInfo apiInfo() {
         return new ApiInfo(
-                "LAN-Party Manager API",
-                "Description of the HTTP-REST API from our LAN-Party Manager backend.",
+                "Game-Radar API",
+                "Description of the HTTP-REST API of the Game-Radar backend.",
                 version,
                 "",
                 new Contact("grimsi", "https://www.grimsi.de", ""),

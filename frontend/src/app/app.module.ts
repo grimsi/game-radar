@@ -28,7 +28,13 @@ import {MatDialogModule} from "@angular/material/dialog";
 import {MatButtonModule} from "@angular/material/button";
 import {MatInputModule} from "@angular/material/input";
 import {FlexModule} from "@angular/flex-layout";
-import { SetupPageComponent } from './components/setup-page/setup-page.component';
+import {SetupPageComponent} from './components/setup-page/setup-page.component';
+import {GameserverListComponent} from './components/gameserver-list/gameserver-list.component';
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {GameserverTableComponent} from "./components/gameserver-table/gameserver-table.component";
+import {MatTableModule} from "@angular/material/table";
+import {MatPaginatorModule} from "@angular/material/paginator";
+import {MatSortModule} from "@angular/material/sort";
 
 @NgModule({
   declarations: [
@@ -41,7 +47,9 @@ import { SetupPageComponent } from './components/setup-page/setup-page.component
     PageNotFoundComponent,
     NotImplementedComponent,
     ErrorDialogComponent,
-    SetupPageComponent
+    SetupPageComponent,
+    GameserverListComponent,
+    GameserverTableComponent
   ],
   imports: [
     BrowserModule,
@@ -61,7 +69,11 @@ import { SetupPageComponent } from './components/setup-page/setup-page.component
     MatDialogModule,
     MatButtonModule,
     MatInputModule,
-    FlexModule
+    FlexModule,
+    MatProgressSpinnerModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule
   ],
   providers: [
     {
